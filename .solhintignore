@@ -1,0 +1,8 @@
+node_modules
+
+**/lib/*
+**/broadcast/*
+**/out/*
+
+*.env
+pnpm-lock.yaml

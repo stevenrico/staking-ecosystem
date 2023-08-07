@@ -1,0 +1,20 @@
+# VS Code settings
+.vscode/
+
+# Dependencies
+node_modules/
+
+# Compiler files
+cache/
+out/
+
+# Development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Environment files
+.env

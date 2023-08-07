@@ -1,0 +1,34 @@
+{
+  "name": "forge-template-pnpm",
+  "version": "1.0.0",
+  "description": "A template for solidity development with forge and pnpm",
+  "scripts": {
+    "deploy:local": "forge script script/Deploy.s.sol:DeployScript --rpc-url localhost --broadcast",
+    "lint": "pnpm lint:sol",
+    "lint:sol": "forge fmt --check && solhint -w 0 '**/*.sol'",
+    "fmt": "pnpm fmt:sol",
+    "fmt:sol": "forge fmt",
+    "test": "pnpm test:sol",
+    "test:sol": "forge test",
+    "clean": "rm -rf cache out broadcast",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "Steven Rico",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.1",
+    "solhint": "^3.5.1"
+  },
+  "lint-staged": {
+    "*.sol": [
+      "forge fmt",
+      "solhint -w 0 '**/*.sol' --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  }
+}

@@ -3,12 +3,10 @@
   "rules": {
     "no-empty-blocks": "off",
     "reason-string": ["error", { "maxLength": 64 }],
-    "func-name-mixedcase": "off",
-    "func-named-parameters": "off",
     "func-param-name-mixedcase": "error",
     "modifier-name-mixedcase": "error",
     "private-vars-leading-underscore": ["error", { "strict": false }],
-    "compiler-version": ["error", "^0.8.0"],
+    "compiler-version": ["error", "0.8.18"],
     "func-visibility": ["error", { "ignoreConstructors": true }],
     "no-inline-assembly": "off"
   }

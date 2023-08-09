@@ -4,8 +4,9 @@
   "description": "A template for solidity development with forge and pnpm",
   "scripts": {
     "deploy:local": "forge script script/Deploy.s.sol:DeployScript --rpc-url localhost --broadcast",
-    "lint": "pnpm lint:sol",
-    "lint:sol": "forge fmt --check && solhint -w 0 '**/*.sol'",
+    "lint": "pnpm lint:dev && pnpm lint:prod",
+    "lint:dev": "solhint -w 0 -c '.solhint.json' --ignore-path '.solhintignore' '**/*.sol'",
+    "lint:prod": "solhint -w 0 -c '.solhint.prod.json' --ignore-path '.solhintignore.prod' '**/*.sol'",
     "fmt": "pnpm fmt:sol",
     "fmt:sol": "forge fmt",
     "test": "pnpm test:sol",
@@ -25,7 +26,8 @@
   "lint-staged": {
     "*.sol": [
       "forge fmt",
-      "solhint -w 0 '**/*.sol' --fix"
+      "solhint -w 0 -c '.solhint.json' --ignore-path '.solhintignore' '**/*.sol'",
+      "solhint -w 0 -c '.solhint.prod.json' --ignore-path '.solhintignore.prod' '**/*.sol'"
     ],
     "*.json": [
       "prettier --write"

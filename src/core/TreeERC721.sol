@@ -3,11 +3,24 @@ pragma solidity 0.8.18;
 
 import { ERC721 } from "@openzeppelin/token/ERC721/ERC721.sol";
 
-contract TreeERC721 is ERC721 {
+import { Ownable2Step } from "@openzeppelin/access/Ownable2Step.sol";
+
+contract TreeERC721 is ERC721, Ownable2Step {
     uint256 public constant MAX_SUPPLY = 2000;
     uint256 public constant MINT_PRICE = 0.3 ether;
 
     uint256 private _tokenIndex;
+
+    /**
+     * @dev Error thrown when the contract's balance is insufficent.
+     */
+    error InsufficientBalance();
+
+    /**
+     * @dev Error thrown when the transaction fails to send, the recipient may
+     * have reverted.
+     */
+    error SendFailure();
 
     /**
      * @dev Error thrown when the incorrect amount is sent to the contract.
@@ -25,6 +38,21 @@ contract TreeERC721 is ERC721 {
      * @dev Sets the {ERC721-name} and {ERC721-symbol}.
      */
     constructor() ERC721("Tree NFT", "TREE") { }
+
+    /**
+     * @dev Withdraw accumulated balance from the contract.
+     *
+     * Restricts access to contract's owner, see {Ownable-onlyOwner}.
+     */
+    function withdraw() external onlyOwner {
+        uint256 balance = address(this).balance;
+
+        if (balance == 0) revert InsufficientBalance();
+
+        (bool success,) = msg.sender.call{ value: balance }("");
+
+        if (!success) revert SendFailure();
+    }
 
     /**
      * @dev Get the total supply.

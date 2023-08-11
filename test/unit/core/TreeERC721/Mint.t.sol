@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.18;
 
-import { Test } from "@forge-std/Test.sol";
+// solhint-disable-next-line no-unused-import
+import { Test, stdStorage, StdStorage } from "@forge-std/Test.sol";
 import { TreeERC721 } from "contracts/core/TreeERC721.sol";
 
 import { ERC721ReceiverMock } from "@openzeppelin/mocks/token/ERC721ReceiverMock.sol";
 import { MockContract } from "tests/mocks/MockContract.sol";
 
 contract MintUnit is Test {
+    using stdStorage for StdStorage;
+
     TreeERC721 private _tree;
 
     uint256 public constant MAX_SUPPLY = 2000;
@@ -78,16 +81,11 @@ contract MintUnit is Test {
     }
 
     function test_ItRevertsWhenMaxSupplyIsReached() external {
-        vm.startPrank(_minter);
-
-        for (uint256 i = 0; i < MAX_SUPPLY; i++) {
-            _tree.mint{ value: MINT_PRICE }();
-        }
+        stdstore.target(address(_tree)).sig("product()").depth(2).checked_write(MAX_SUPPLY);
 
         vm.expectRevert(MaxSupplyReached.selector);
+        vm.prank(_minter);
         _tree.mint{ value: MINT_PRICE }();
-
-        vm.stopPrank();
     }
 
     function test_WhenCallerIsEOA_ItTransfersToken() external {

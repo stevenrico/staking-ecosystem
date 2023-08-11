@@ -7,21 +7,24 @@ import { Products } from "contracts/commerce/structs/Products.sol";
 contract ProductsUnit is Test {
     using Products for Products.Product;
 
+    uint256 public constant MAX_SUPPLY = 10;
+    uint256 public constant MINT_PRICE = 0.1 ether;
+
     Products.Product private _product;
 
     error IncorrectAmount();
     error MaxSupplyReached();
 
     function setUp() external {
-        _product = Products.Product({ maxSupply: 10, price: 0.1 ether, currentSupply: 0 });
+        _product = Products.Product({ maxSupply: MAX_SUPPLY, price: MINT_PRICE, currentSupply: 0 });
     }
 
     function test_MaxSupply() external {
-        assertEq(_product.maxSupply, 10);
+        assertEq(_product.maxSupply, MAX_SUPPLY);
     }
 
     function test_Price() external {
-        assertEq(_product.price, 0.1 ether);
+        assertEq(_product.price, MINT_PRICE);
     }
 
     function test_CurrentSupply() external {
@@ -37,7 +40,7 @@ contract ProductsUnit is Test {
 
         Products.Product memory product = _product;
 
-        product.verifyPurchaseAmount(0.1 ether);
+        product.verifyPurchaseAmount(MINT_PRICE);
 
         assertTrue(success);
     }
@@ -74,9 +77,7 @@ contract ProductsUnit is Test {
     }
 
     function test_OnIncrement_ItRevertsWhenMaxSupplyIsReached() external {
-        for (uint256 i = 0; i < 10; i++) {
-            _product.increment();
-        }
+        _product.currentSupply = MAX_SUPPLY;
 
         vm.expectRevert(MaxSupplyReached.selector);
         _product.increment();

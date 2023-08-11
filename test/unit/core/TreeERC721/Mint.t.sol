@@ -16,7 +16,7 @@ contract MintUnit is Test {
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 
     error IncorrectAmount();
-    error MaxSupplyReached(address sender);
+    error MaxSupplyReached();
 
     address private _minter;
 
@@ -84,7 +84,7 @@ contract MintUnit is Test {
             _tree.mint{ value: MINT_PRICE }();
         }
 
-        vm.expectRevert(abi.encodeWithSelector(MaxSupplyReached.selector, _minter));
+        vm.expectRevert(MaxSupplyReached.selector);
         _tree.mint{ value: MINT_PRICE }();
 
         vm.stopPrank();

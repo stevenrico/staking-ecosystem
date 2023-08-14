@@ -6,13 +6,13 @@ import { Test, stdStorage, StdStorage } from "@forge-std/Test.sol";
 import { Checkout } from "contracts/commerce/Checkout/Checkout.sol";
 
 import { Products } from "contracts/commerce/structs/Products.sol";
-import { CheckoutMock } from "tests/unit/commerce/Checkout/mocks/CheckoutMock.sol";
+import { CheckoutHarness } from "tests/unit/commerce/Checkout/harnesses/Checkout.h.sol";
 
 contract MintUnit is Test {
     using stdStorage for StdStorage;
 
     Checkout private _checkout;
-    CheckoutMock private _checkoutMock;
+    CheckoutHarness private _checkoutHarness;
 
     uint256 public constant MAX_SUPPLY = 10;
     uint256 public constant MINT_PRICE = 0.1 ether;
@@ -27,7 +27,7 @@ contract MintUnit is Test {
             Products.Product({ maxSupply: MAX_SUPPLY, price: MINT_PRICE, currentSupply: 0 });
 
         _checkout = new Checkout(product);
-        _checkoutMock = new CheckoutMock(product);
+        _checkoutHarness = new CheckoutHarness(product);
 
         _minter = vm.addr(1000);
         vm.label(_minter, "[MINTER | 1000]");
@@ -43,9 +43,9 @@ contract MintUnit is Test {
 
     function test_ItCallsHandleMint() external {
         vm.prank(_minter);
-        _checkoutMock.mint{ value: MINT_PRICE }();
+        _checkoutHarness.mint{ value: MINT_PRICE }();
 
-        (address recipient, uint256 id) = _checkoutMock.handleMintData();
+        (address recipient, uint256 id) = _checkoutHarness.handleMintData();
 
         assertEq(recipient, _minter);
         assertEq(id, 1);

@@ -5,7 +5,7 @@ import { Checkout } from "contracts/commerce/Checkout/Checkout.sol";
 
 import { Products } from "contracts/commerce/structs/Products.sol";
 
-contract CheckoutMock is Checkout {
+contract CheckoutHarness is Checkout {
     struct HandleMintData {
         address recipient;
         uint256 id;

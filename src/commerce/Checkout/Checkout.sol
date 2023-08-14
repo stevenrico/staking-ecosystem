@@ -6,7 +6,7 @@ import { Products } from "contracts/commerce/structs/Products.sol";
 contract Checkout {
     using Products for Products.Product;
 
-    Products.Product private _product;
+    Products.Product internal _product;
 
     constructor(Products.Product memory product_) {
         _product = product_;

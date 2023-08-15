@@ -2,6 +2,7 @@
   "name": "forge-template-pnpm",
   "version": "1.0.0",
   "description": "A template for solidity development with forge and pnpm",
+  "type": "module",
   "scripts": {
     "deploy:local": "forge script script/Deploy.s.sol:DeployScript --rpc-url localhost --broadcast",
     "lint": "pnpm lint:dev && pnpm lint:prod",
@@ -18,6 +19,7 @@
   "author": "Steven Rico",
   "license": "ISC",
   "devDependencies": {
+    "@openzeppelin/merkle-tree": "^1.0.5",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",

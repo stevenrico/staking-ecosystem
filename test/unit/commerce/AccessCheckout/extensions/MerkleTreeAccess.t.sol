@@ -7,11 +7,13 @@ import { AccessCheckoutMerkleTree } from "contracts/commerce/AccessCheckout/exte
 import { AccessLists } from "contracts/commerce/structs/AccessLists.sol";
 import { Products } from "contracts/commerce/structs/Products.sol";
 
+import { Users } from "tests/utils/Users.sol";
+import { MerkleTree } from "tests/unit/commerce/utils/MerkleTree/MerkleTree.sol";
+
 import { Strings } from "@openzeppelin/utils/Strings.sol";
 
 contract AccessCheckoutMerkleTreeUnit is Test {
     using Strings for uint256;
-    using Strings for address;
 
     AccessCheckoutMerkleTree private _checkout;
 
@@ -32,51 +34,18 @@ contract AccessCheckoutMerkleTreeUnit is Test {
         AccessLists.AccessListConfig memory config_ =
             AccessLists.AccessListConfig({ maxSupply: ACCESS_MAX_SUPPLY, price: ACCESS_MINT_PRICE });
 
-        _minters = _generateUsers(ACCESS_MAX_SUPPLY, "MINTER");
+        _minters = Users.generateUsers(1000, ACCESS_MAX_SUPPLY, "MINTER", 1 ether);
 
-        bytes32 root = _getMerkleTreeRoot();
+        bytes32 root = MerkleTree.getMerkleTreeRoot("AccessCheckoutMerkleTree.json");
 
         _checkout = new AccessCheckoutMerkleTree(product_, config_, root);
-    }
-
-    function _generateUsers(uint256 numOfUsers, string memory group) private returns (address[] memory) {
-        address[] memory users = new address[](numOfUsers);
-
-        uint256 startIndex = 1000;
-
-        for (uint256 i = 0; i < numOfUsers; i++) {
-            uint256 privateKey = startIndex + i;
-
-            address user = vm.addr(privateKey);
-            vm.label(user, string.concat("[", group, " | ", privateKey.toString(), "]"));
-            vm.deal(user, 1 ether);
-
-            users[i] = user;
-        }
-
-        return users;
-    }
-
-    function _getMerkleTreeRoot() private returns (bytes32) {
-        string memory merkleTree =
-            vm.readFile("./test/unit/commerce/utils/MerkleTree/outputs/AccessCheckoutMerkleTree.json");
-
-        return vm.parseJsonBytes32(merkleTree, "$.root");
-    }
-
-    function _getProof(uint256 ticketId) private returns (bytes32[] memory) {
-        string memory merkleTree =
-            vm.readFile("./test/unit/commerce/utils/MerkleTree/outputs/AccessCheckoutMerkleTree.json");
-
-        string memory key = string.concat("$.proofs.", ticketId.toString());
-
-        return vm.parseJsonBytes32Array(merkleTree, key);
     }
 
     function test_ItVerifiesProof() external {
         address minter = _minters[0];
         uint256 ticketId = 0;
-        bytes32[] memory proof = _getProof(ticketId);
+        string memory key = string.concat("$.proofs.", ticketId.toString());
+        bytes32[] memory proof = MerkleTree.getProof("AccessCheckoutMerkleTree.json", key);
 
         bool success = true;
 
@@ -88,8 +57,9 @@ contract AccessCheckoutMerkleTreeUnit is Test {
 
     function test_ItRevertsWhenProofVerificationFails() external {
         address minter = _minters[0];
-        uint256 ticketId = 0;
-        bytes32[] memory invalidProof = _getProof(1);
+        uint256 ticketId = 1;
+        string memory key = string.concat("$.proofs.", ticketId.toString());
+        bytes32[] memory invalidProof = MerkleTree.getProof("AccessCheckoutMerkleTree.json", key);
 
         vm.expectRevert(ProofVerificationFailure.selector);
         vm.prank(minter);

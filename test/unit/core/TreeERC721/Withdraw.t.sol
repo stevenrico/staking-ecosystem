@@ -4,6 +4,9 @@ pragma solidity 0.8.18;
 import { Test } from "@forge-std/Test.sol";
 import { TreeERC721 } from "contracts/core/TreeERC721.sol";
 
+import { Users } from "tests/utils/Users.sol";
+import { MerkleTree } from "tests/unit/commerce/utils/MerkleTree/MerkleTree.sol";
+
 contract WithdrawUnit is Test {
     TreeERC721 private _tree;
 
@@ -13,16 +16,14 @@ contract WithdrawUnit is Test {
     address private _unauthorized;
 
     function setUp() external {
-        _owner = vm.addr(1000);
-        vm.label(_owner, "[OWNER | 1000]");
-        vm.deal(_owner, 1 ether);
+        _owner = Users.generateUser(1000, "OWNER", 1 ether);
+
+        bytes32 root = MerkleTree.getMerkleTreeRoot("AccessCheckoutMerkleTree.json");
 
         vm.prank(_owner);
-        _tree = new TreeERC721();
+        _tree = new TreeERC721(root);
 
-        _unauthorized = vm.addr(2000);
-        vm.label(_unauthorized, "[UNAUTHORIZED | 2000]");
-        vm.deal(_unauthorized, 1 ether);
+        _unauthorized = Users.generateUser(2000, "UNAUTHORIZED", 1 ether);
     }
 
     function test_WhenCallerIsOwner_ItTransfersETH() external {

@@ -5,14 +5,18 @@ import { ERC721 } from "@openzeppelin/token/ERC721/ERC721.sol";
 
 import { Ownable2Step } from "@openzeppelin/access/Ownable2Step.sol";
 
-import { Checkout } from "contracts/commerce/Checkout/Checkout.sol";
+import { AccessCheckoutMerkleTree } from "contracts/commerce/AccessCheckout/extensions/AccessCheckoutMerkleTree.sol";
 import { Products } from "contracts/commerce/structs/Products.sol";
+import { AccessLists } from "contracts/commerce/structs/AccessLists.sol";
 
-contract TreeERC721 is ERC721, Checkout, Ownable2Step {
+contract TreeERC721 is ERC721, AccessCheckoutMerkleTree, Ownable2Step {
     using Products for Products.Product;
 
     uint256 public constant MAX_SUPPLY = 2000;
     uint256 public constant MINT_PRICE = 0.3 ether;
+
+    uint256 public constant ACCESS_MAX_SUPPLY = 400;
+    uint256 public constant ACCESS_MINT_PRICE = 0.2 ether;
 
     /**
      * @dev Error thrown when the contract's balance is insufficent.
@@ -29,11 +33,16 @@ contract TreeERC721 is ERC721, Checkout, Ownable2Step {
      * @dev Setup {ERC721} and {Checkout}.
      *
      * - For {ERC721}, it sets the {ERC721-name} and {ERC721-symbol}.
-     * - For {Checkout}, it sets the {Checkout-_product}.
+     * - For {AccessCheckoutMerkleTree}, it sets the {Checkout-_product}, {AccessCheckout-_accesList}
+     * and {AccessCheckoutMerkleTree-_root}.
      */
-    constructor()
+    constructor(bytes32 root)
         ERC721("Tree NFT", "TREE")
-        Checkout(Products.Product({ maxSupply: MAX_SUPPLY, price: MINT_PRICE, currentSupply: 0 }))
+        AccessCheckoutMerkleTree(
+            Products.Product({ maxSupply: MAX_SUPPLY, price: MINT_PRICE, currentSupply: 0 }),
+            AccessLists.AccessListConfig({ maxSupply: ACCESS_MAX_SUPPLY, price: ACCESS_MINT_PRICE }),
+            root
+        )
     { }
 
     /**

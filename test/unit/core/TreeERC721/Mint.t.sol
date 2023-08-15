@@ -5,6 +5,9 @@ pragma solidity 0.8.18;
 import { Test, stdStorage, StdStorage } from "@forge-std/Test.sol";
 import { TreeERC721 } from "contracts/core/TreeERC721.sol";
 
+import { Users } from "tests/utils/Users.sol";
+import { MerkleTree } from "tests/unit/commerce/utils/MerkleTree/MerkleTree.sol";
+
 import { ERC721ReceiverMock } from "@openzeppelin/mocks/token/ERC721ReceiverMock.sol";
 import { MockContract } from "tests/mocks/MockContract.sol";
 
@@ -27,11 +30,11 @@ contract MintUnit is Test {
     address private _contractWithoutReceiver;
 
     function setUp() external {
-        _tree = new TreeERC721();
+        bytes32 root = MerkleTree.getMerkleTreeRoot("AccessCheckoutMerkleTree.json");
 
-        _minter = vm.addr(1000);
-        vm.label(_minter, "[MINTER | EOA]");
-        vm.deal(_minter, 1000 ether);
+        _tree = new TreeERC721(root);
+
+        _minter = Users.generateUser(1000, "EOA MINTER", 1000 ether);
 
         _contractWithReceiver = _generateContractWithReceiver();
         _contractWithoutReceiver = _generateContractWithoutReceiver();
